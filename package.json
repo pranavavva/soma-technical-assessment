@@ -12,7 +12,10 @@
     "format": "prettier . --check",
     "format:fix": "prettier . --write",
     "prek": "prek run",
-    "prek:install": "prek install"
+    "prek:install": "prek install",
+    "db:migrate": "prisma migrate dev",
+    "db:generate": "prisma generate",
+    "db:studio": "prisma studio"
   },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^7.6.0",
