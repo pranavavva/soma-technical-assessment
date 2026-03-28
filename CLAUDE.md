@@ -28,6 +28,7 @@ Next.js App Router with a single-page client component (`app/page.tsx`) that tal
 **Data layer:** Prisma ORM with SQLite (`prisma/dev.db`). Schema in `prisma/schema.prisma`. Singleton client in `lib/prisma.ts` (cached on `global` to survive HMR).
 
 **API routes:**
+
 - `app/api/todos/route.ts` — `GET` (list all) and `POST` (create)
 - `app/api/todos/[id]/route.ts` — `DELETE` by id
 
