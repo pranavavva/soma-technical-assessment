@@ -7,7 +7,7 @@ interface Params {
   };
 }
 
-export async function DELETE(request: Request, { params }: Params) {
+export async function DELETE(_request: Request, { params }: Params) {
   const id = parseInt(params.id);
   if (isNaN(id)) {
     return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
@@ -18,7 +18,8 @@ export async function DELETE(request: Request, { params }: Params) {
       where: { id },
     });
     return NextResponse.json({ message: "Todo deleted" }, { status: 200 });
-  } catch (error) {
+    // TODO: error handling
+  } catch {
     return NextResponse.json({ error: "Error deleting todo" }, { status: 500 });
   }
 }

@@ -2,7 +2,7 @@
 
 This is a technical assessment as part of the interview process for Soma Capital.
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > You will need a Pexels API key to complete the technical assessment portion of the application. You can sign up for a free API key at https://www.pexels.com/api/
 
 To begin, clone this repository to your local machine.
