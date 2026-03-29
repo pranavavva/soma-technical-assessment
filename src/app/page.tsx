@@ -1,5 +1,5 @@
 "use client";
-import { Todo } from "@prisma/client";
+import { Todo } from "@/generated/prisma/browser";
 import { useState, useEffect } from "react";
 
 export default function Home() {
