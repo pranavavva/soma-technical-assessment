@@ -28,6 +28,10 @@ export async function addTodo(formData: FormData) {
 }
 
 export async function deleteTodo(id: number) {
+  // Delete relationships first (manual cascade for SQLite FK constraints)
+  await prisma.todoRelationship.deleteMany({
+    where: { OR: [{ dependentId: id }, { dependencyId: id }] },
+  });
   await prisma.todo.delete({ where: { id } });
   revalidatePath("/");
 }
