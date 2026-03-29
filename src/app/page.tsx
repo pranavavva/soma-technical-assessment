@@ -1,9 +1,12 @@
 import { prisma } from "@/lib/prisma";
-import TodoList from "@/components/TodoList";
-import { AddTodoForm } from "@/components/AddTodoForm";
-import DependencyGraph from "@/components/DependencyGraph";
+import { DataTable } from "@/components/tasks/data-table";
+import { columns, type TaskRow } from "@/components/tasks/columns";
+import { DependencyFlowGraph } from "@/components/tasks/dependency-flow-graph";
+import { TasksTabs } from "@/components/tasks/tasks-tabs";
 import { buildAdjacencyList, todoId, type TodoNode } from "@/lib/graph/types";
 import { calculateEarliestStartDates, getCriticalPath } from "@/lib/graph/critical-path";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { Suspense } from "react";
 
 export default async function Home() {
   const todos = await prisma.todo.findMany({
@@ -31,30 +34,48 @@ export default async function Home() {
   const earliestStartDates = calculateEarliestStartDates(todoNodes, graph);
   const criticalPath = getCriticalPath(todoNodes, graph);
 
-  // Serialize for client components
-  const earliestStartDatesObj: Record<number, string | null> = {};
-  earliestStartDates.forEach((date, id) => {
-    earliestStartDatesObj[id] = date?.toISOString() ?? null;
+  // Build lookup for dependency titles
+  const todoById = new Map(todos.map((t) => [t.id, t]));
+
+  const taskRows: TaskRow[] = todos.map((t) => {
+    const depIds = t.dependencies.map((d) => d.dependencyId);
+    return {
+      id: t.id,
+      title: t.title,
+      status: t.status,
+      createdAt: t.createdAt.toISOString(),
+      dueDate: t.dueDate?.toISOString() ?? null,
+      imageUrl: t.imageUrl,
+      dependencyIds: depIds,
+      dependencyTitles: depIds.map((id) => todoById.get(id)?.title ?? "Unknown"),
+      earliestStartDate: earliestStartDates.get(todoId(t.id))?.toISOString() ?? null,
+      isOnCriticalPath: criticalPath.includes(todoId(t.id)),
+    };
   });
 
-  const dependencyIdsMap: Record<number, number[]> = {};
-  todos.forEach((t) => {
-    dependencyIdsMap[t.id] = t.dependencies.map((d) => d.dependencyId);
-  });
+  const todosForGraph = todos.map((t) => ({
+    id: t.id,
+    title: t.title,
+    status: t.status,
+  }));
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-linear-to-b from-orange-500 to-red-500 p-4">
-      <div className="w-full max-w-md">
-        <h1 className="mb-8 text-center text-4xl font-bold text-white">Things To Do App</h1>
-        <AddTodoForm />
-        <TodoList
-          todos={todos}
-          earliestStartDates={earliestStartDatesObj}
-          criticalPath={criticalPath}
-          dependencyIdsMap={dependencyIdsMap}
-        />
-        <DependencyGraph todos={todos} relationships={relationships} criticalPath={criticalPath} />
-      </div>
-    </div>
+    <NuqsAdapter>
+      <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:py-12">
+        <header className="mb-8">
+          <h1 className="text-3xl font-semibold tracking-tight">Tasks</h1>
+          <p className="text-muted-foreground mt-1 text-sm">Manage your tasks and dependencies.</p>
+        </header>
+
+        <Suspense>
+          <TasksTabs
+            tasksContent={<DataTable columns={columns} data={taskRows} />}
+            dependenciesContent={
+              <DependencyFlowGraph todos={todosForGraph} relationships={relationships} criticalPath={criticalPath} />
+            }
+          />
+        </Suspense>
+      </main>
+    </NuqsAdapter>
   );
 }
