@@ -16,6 +16,7 @@ datasource db {
 model Todo {
   id        Int       @id @default(autoincrement())
   title     String
+  status    String    @default("todo")
   createdAt DateTime  @default(now())
   dueDate   DateTime?
   imageUrl  String?
