@@ -13,6 +13,7 @@ export async function addTodo(formData: FormData) {
   const { id } = await prisma.todo.create({
     data: {
       title,
+      status: "todo",
       dueDate: dueDate ? new Date(dueDate) : null,
     },
   });
@@ -21,6 +22,18 @@ export async function addTodo(formData: FormData) {
 
   await prisma.todo.update({
     data: { imageUrl },
+    where: { id },
+  });
+
+  revalidatePath("/");
+}
+
+export async function updateTodoStatus(id: number, status: string) {
+  const validStatuses = ["todo", "in progress", "done"];
+  if (!validStatuses.includes(status)) return;
+
+  await prisma.todo.update({
+    data: { status },
     where: { id },
   });
 
