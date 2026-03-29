@@ -20,12 +20,12 @@ function computeLevels(todos: GraphNode[], relationships: DependencyGraphProps["
   const deps = new Map<number, number[]>(); // id -> list of dependency ids
   const ids = new Set(todos.map((t) => t.id));
 
-  for (const id of ids) deps.set(id, []);
-  for (const r of relationships) {
+  ids.forEach((id) => deps.set(id, []));
+  relationships.forEach((r) => {
     if (ids.has(r.dependentId) && ids.has(r.dependencyId)) {
       deps.get(r.dependentId)!.push(r.dependencyId);
     }
-  }
+  });
 
   const levels = new Map<number, number>();
   const visited = new Set<number>();
@@ -40,7 +40,7 @@ function computeLevels(todos: GraphNode[], relationships: DependencyGraphProps["
     return level;
   }
 
-  for (const id of ids) getLevel(id);
+  ids.forEach((id) => getLevel(id));
   return levels;
 }
 
@@ -53,25 +53,25 @@ export default function DependencyGraph({ todos, relationships, criticalPath }: 
 
   // Only include nodes that participate in relationships
   const participatingIds = new Set<number>();
-  for (const r of relationships) {
+  relationships.forEach((r) => {
     participatingIds.add(r.dependentId);
     participatingIds.add(r.dependencyId);
-  }
+  });
   const participatingNodes = nodes.filter((t) => participatingIds.has(t.id));
 
   // Group participating nodes by level
   const grouped = new Map<number, GraphNode[]>();
-  for (const node of participatingNodes) {
+  participatingNodes.forEach((node) => {
     const lv = levels.get(node.id) ?? 0;
     if (!grouped.has(lv)) grouped.set(lv, []);
     grouped.get(lv)!.push(node);
-  }
+  });
 
   // Position map
   const pos = new Map<number, { x: number; y: number }>();
   let maxX = 0;
   let maxY = 0;
-  for (const [lv, group] of grouped) {
+  grouped.forEach((group, lv) => {
     group.forEach((todo, i) => {
       const x = lv * H_SPACING + PAD;
       const y = i * V_SPACING + PAD;
@@ -79,7 +79,7 @@ export default function DependencyGraph({ todos, relationships, criticalPath }: 
       maxX = Math.max(maxX, x + NODE_W);
       maxY = Math.max(maxY, y + NODE_H);
     });
-  }
+  });
 
   const vbW = Math.max(300, maxX + PAD);
   const vbH = Math.max(200, maxY + PAD);

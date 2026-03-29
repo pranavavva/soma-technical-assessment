@@ -17,9 +17,8 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const { title, dueDate } = await request.json();
-    if (!title || title.trim() === "") {
-      return NextResponse.json({ error: "Title is required" }, { status: 400 });
-    }
+    if (!title || title.trim() === "") return NextResponse.json({ error: "Title is required" }, { status: 400 });
+
     const todo = await prisma.todo.create({
       data: {
         title,

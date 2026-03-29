@@ -9,9 +9,7 @@ export async function addDependency(
   dependentId: number,
   dependencyId: number,
 ): Promise<{ success: boolean; error?: string }> {
-  if (dependentId === dependencyId) {
-    return { success: false, error: "A task cannot depend on itself" };
-  }
+  if (dependentId === dependencyId) return { success: false, error: "A task cannot depend on itself" };
 
   const relationships = await prisma.todoRelationship.findMany({
     select: { dependentId: true, dependencyId: true },
@@ -19,12 +17,11 @@ export async function addDependency(
 
   const graph = buildAdjacencyList(relationships);
 
-  if (wouldCreateCycle(graph, todoId(dependentId), todoId(dependencyId))) {
+  if (wouldCreateCycle(graph, todoId(dependentId), todoId(dependencyId)))
     return {
       success: false,
       error: "Adding this dependency would create a circular dependency",
     };
-  }
 
   try {
     await prisma.todoRelationship.create({

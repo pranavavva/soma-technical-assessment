@@ -25,20 +25,16 @@ export function buildAdjacencyList(
 ): AdjacencyList {
   const graph: AdjacencyList = new Map();
 
-  for (const { dependentId, dependencyId } of relationships) {
+  relationships.forEach(({ dependentId, dependencyId }) => {
     const dependent = todoId(dependentId);
     const dependency = todoId(dependencyId);
 
-    if (!graph.has(dependent)) {
-      graph.set(dependent, []);
-    }
+    if (!graph.has(dependent)) graph.set(dependent, []);
     graph.get(dependent)!.push(dependency);
 
     // Ensure the dependency node also exists in the map
-    if (!graph.has(dependency)) {
-      graph.set(dependency, []);
-    }
-  }
+    if (!graph.has(dependency)) graph.set(dependency, []);
+  });
 
   return graph;
 }

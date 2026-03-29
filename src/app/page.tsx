@@ -38,9 +38,9 @@ export default async function Home() {
   });
 
   const dependencyIdsMap: Record<number, number[]> = {};
-  for (const t of todos) {
+  todos.forEach((t) => {
     dependencyIdsMap[t.id] = t.dependencies.map((d) => d.dependencyId);
-  }
+  });
 
   return (
     <div className="flex min-h-screen flex-col items-center bg-linear-to-b from-orange-500 to-red-500 p-4">
