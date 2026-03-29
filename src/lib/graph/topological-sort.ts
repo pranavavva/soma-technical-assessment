@@ -29,19 +29,17 @@ export function topologicalSort(graph: AdjacencyList): TodoId[] {
   });
 
   graph.forEach((dependencies, dependent) => {
-    for (const dependency of dependencies) {
+    dependencies.forEach((dependency) => {
       // Reverse edge: dependency -> dependent
       reverseGraph.get(dependency)!.push(dependent);
       inDegree.set(dependent, (inDegree.get(dependent) ?? 0) + 1);
-    }
+    });
   });
 
   // Start with nodes that have no dependencies (in-degree 0 in reverse graph)
   const queue: TodoId[] = [];
   inDegree.forEach((degree, nodeId) => {
-    if (degree === 0) {
-      queue.push(nodeId);
-    }
+    if (degree === 0) queue.push(nodeId);
   });
 
   const result: TodoId[] = [];
@@ -50,13 +48,11 @@ export function topologicalSort(graph: AdjacencyList): TodoId[] {
     const current = queue.shift()!;
     result.push(current);
 
-    for (const neighbor of reverseGraph.get(current) ?? []) {
+    (reverseGraph.get(current) ?? []).forEach((neighbor) => {
       const newDegree = inDegree.get(neighbor)! - 1;
       inDegree.set(neighbor, newDegree);
-      if (newDegree === 0) {
-        queue.push(neighbor);
-      }
-    }
+      if (newDegree === 0) queue.push(neighbor);
+    });
   }
 
   return result;

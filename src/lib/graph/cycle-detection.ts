@@ -24,11 +24,9 @@ export function wouldCreateCycle(graph: AdjacencyList, fromId: TodoId, toId: Tod
     visited.add(current);
 
     const neighbors = graph.get(current) ?? [];
-    for (const neighbor of neighbors) {
-      if (!visited.has(neighbor)) {
-        stack.push(neighbor);
-      }
-    }
+    neighbors.forEach((neighbor) => {
+      if (!visited.has(neighbor)) stack.push(neighbor);
+    });
   }
 
   return false;
