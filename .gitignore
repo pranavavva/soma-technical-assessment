@@ -7,3 +7,5 @@ node_modules
 src/generated
 .claude/settings.local.json
 .worktrees
+.superpowers/
+docs/superpowers/

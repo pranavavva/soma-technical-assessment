@@ -1,6 +1,6 @@
 "use client";
 
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { VisuallyHidden } from "radix-ui";
 import Image from "next/image";
 
@@ -17,6 +17,7 @@ export function ImageDialog({ open, onOpenChange, imageUrl, alt }: ImageDialogPr
       <DialogContent className="max-w-4xl p-2">
         <VisuallyHidden.Root>
           <DialogTitle>{alt}</DialogTitle>
+          <DialogDescription>Task image preview</DialogDescription>
         </VisuallyHidden.Root>
         <div className="relative aspect-video w-full overflow-hidden rounded-lg">
           <Image src={imageUrl} alt={alt} fill className="object-cover" sizes="(max-width: 896px) 100vw, 896px" />
