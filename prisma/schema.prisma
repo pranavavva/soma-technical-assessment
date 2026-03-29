@@ -7,8 +7,30 @@ datasource db {
   provider = "sqlite"
 }
 
+/// Model Todo dependencies as a digraph
+/// Todos -> vertices
+/// TodoEdges -> edges
+/// from -> dependent
+/// to -> dependency
+
 model Todo {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   title     String
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
+  dueDate   DateTime?
+  imageUrl  String?
+
+  dependencies TodoRelationship[] @relation("Depdendent")
+  dependents   TodoRelationship[] @relation("Dependency")
+}
+
+model TodoRelationship {
+  id           Int @id @default(autoincrement())
+  dependentId  Int
+  dependencyId Int
+
+  dependent  Todo @relation("Depdendent", fields: [dependentId], references: [id])
+  dependency Todo @relation("Dependency", fields: [dependencyId], references: [id])
+
+  @@unique([dependentId, dependencyId])
 }

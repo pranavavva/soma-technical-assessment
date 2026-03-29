@@ -5,3 +5,4 @@ node_modules
 .envrc
 .env
 src/generated
+.claude/settings.local.json
