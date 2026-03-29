@@ -1,8 +1,22 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { addDependency, removeDependency } from "@/app/actions/dependency";
-import { SerializedTodo } from "@/components/TodoList";
+import { buildAdjacencyList, todoId as toTodoId } from "@/lib/graph/types";
+import { wouldCreateCycle } from "@/lib/graph/cycle-detection";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Plus, X, Ban } from "lucide-react";
+
+type SerializedTodo = {
+  id: number;
+  title: string;
+  dueDate: string | null;
+  dependencyIds?: number[];
+  [key: string]: unknown;
+};
 
 type DependencySelectorProps = {
   todoId: number;
@@ -14,13 +28,37 @@ export default function DependencySelector({ todoId, allTodos, currentDependency
   const [depIds, setDepIds] = useState<number[]>(currentDependencyIds);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [open, setOpen] = useState(false);
 
   const dependencyTodos = allTodos.filter((t) => depIds.includes(t.id));
-  const availableTodos = allTodos.filter((t) => t.id !== todoId && !depIds.includes(t.id));
+  const candidateTodos = allTodos.filter((t) => t.id !== todoId);
+
+  // Build adjacency list from current state to check for cycles client-side
+  const cycleSet = useMemo(() => {
+    const relationships: { dependentId: number; dependencyId: number }[] = [];
+    allTodos.forEach((t) => {
+      const effectiveDeps = t.id === todoId ? depIds : (t.dependencyIds ?? []);
+      effectiveDeps.forEach((depId) => {
+        relationships.push({ dependentId: t.id, dependencyId: depId });
+      });
+    });
+
+    const graph = buildAdjacencyList(relationships);
+    const wouldCycle = new Set<number>();
+
+    candidateTodos.forEach((t) => {
+      if (!depIds.includes(t.id) && wouldCreateCycle(graph, toTodoId(todoId), toTodoId(t.id))) {
+        wouldCycle.add(t.id);
+      }
+    });
+
+    return wouldCycle;
+  }, [allTodos, depIds, todoId, candidateTodos]);
 
   function handleAdd(dependencyId: number) {
     setError(null);
     setDepIds((prev) => [...prev, dependencyId]);
+    setOpen(false);
 
     startTransition(async () => {
       const result = await addDependency(todoId, dependencyId);
@@ -41,46 +79,77 @@ export default function DependencySelector({ todoId, allTodos, currentDependency
   }
 
   return (
-    <div className="mt-1">
-      <div className="flex flex-wrap gap-1">
-        {dependencyTodos.map((dep) => (
-          <span
-            key={dep.id}
-            className="inline-flex items-center gap-0.5 rounded-full bg-gray-200 px-2 py-0.5 text-xs text-gray-700"
-          >
-            {dep.title}
-            <button
-              type="button"
-              onClick={() => handleRemove(dep.id)}
-              disabled={isPending}
-              className="ml-0.5 text-gray-500 hover:text-gray-800 disabled:opacity-50"
-            >
-              &times;
-            </button>
-          </span>
-        ))}
-      </div>
-
-      {availableTodos.length > 0 && (
-        <select
-          className="mt-1 w-full rounded border border-gray-300 px-1.5 py-0.5 text-xs text-gray-700 disabled:opacity-50"
-          value=""
-          disabled={isPending}
-          onChange={(e) => {
-            const id = Number(e.target.value);
-            if (id) handleAdd(id);
-          }}
-        >
-          <option value="">Add dependency...</option>
-          {availableTodos.map((t) => (
-            <option key={t.id} value={t.id}>
-              {t.title}
-            </option>
+    <div className="mt-2">
+      {dependencyTodos.length > 0 && (
+        <div className="mb-1.5 flex flex-wrap gap-1">
+          {dependencyTodos.map((dep) => (
+            <Badge key={dep.id} variant="secondary" className="gap-1 pr-1 text-[10px]">
+              {dep.title}
+              <button
+                type="button"
+                onClick={() => handleRemove(dep.id)}
+                disabled={isPending}
+                className="hover:bg-muted-foreground/20 rounded-full p-0.5 disabled:opacity-50"
+              >
+                <X className="h-2.5 w-2.5" />
+              </button>
+            </Badge>
           ))}
-        </select>
+        </div>
       )}
 
-      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+      {candidateTodos.length > 0 && (
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button variant="ghost" size="sm" className="text-muted-foreground h-7 px-2 text-xs" disabled={isPending}>
+              <Plus className="mr-1 h-3 w-3" />
+              Blocked by...
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-56 p-0" align="start">
+            <Command>
+              <CommandInput placeholder="Search tasks..." />
+              <CommandList>
+                <CommandEmpty>No tasks found.</CommandEmpty>
+                {candidateTodos.map((t) => {
+                  const isExisting = depIds.includes(t.id);
+                  const isCyclic = cycleSet.has(t.id);
+                  const isDisabled = isExisting || isCyclic;
+                  const reason = isExisting
+                    ? "Already a dependency"
+                    : isCyclic
+                      ? "Would create circular dependency"
+                      : null;
+
+                  return (
+                    <CommandItem
+                      key={t.id}
+                      onSelect={() => !isDisabled && handleAdd(t.id)}
+                      disabled={isDisabled}
+                      className={isDisabled ? "opacity-50" : ""}
+                    >
+                      <div className="flex min-w-0 flex-1 flex-col">
+                        <div className="flex items-center gap-1">
+                          {isDisabled && <Ban className="text-muted-foreground h-3 w-3 shrink-0" />}
+                          <span className="truncate">{t.title}</span>
+                          {!isDisabled && t.dueDate && (
+                            <span className="text-muted-foreground ml-auto shrink-0 text-xs">
+                              {new Date(t.dueDate).toLocaleDateString()}
+                            </span>
+                          )}
+                        </div>
+                        {reason && <span className="text-muted-foreground text-[10px]">{reason}</span>}
+                      </div>
+                    </CommandItem>
+                  );
+                })}
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+      )}
+
+      {error && <p className="text-destructive mt-1 text-xs">{error}</p>}
     </div>
   );
 }
