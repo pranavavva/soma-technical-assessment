@@ -27,6 +27,7 @@
     "next-env.d.ts",
     "next.config.ts",
     "prisma.config.ts",
+    "postcss.config.mjs",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts",
