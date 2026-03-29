@@ -5,4 +5,12 @@ export default {
   experimental: {
     typedEnv: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.pexels.com",
+      },
+    ],
+  },
 } satisfies NextConfig;

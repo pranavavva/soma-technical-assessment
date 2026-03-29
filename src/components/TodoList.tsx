@@ -1,33 +1,41 @@
 "use client";
 
-import { Todo } from "@/generated/prisma/browser";
-import { deleteTodo } from "@/app/actions/todo";
+import type { Todo } from "@/generated/prisma/browser";
+import TodoItem from "@/components/TodoItem";
+
+/**
+ * Todo with Date fields serialized to ISO strings.
+ * Next.js automatically serializes Date objects when passing props from
+ * Server Components to Client Components, so at runtime these are strings.
+ */
+export type SerializedTodo = Omit<Todo, "createdAt" | "dueDate"> & {
+  createdAt: string;
+  dueDate: string | null;
+};
 
 export type TodoListProps = {
   todos: Todo[];
+  earliestStartDates: Record<number, string | null>;
+  criticalPath: number[];
+  dependencyIdsMap: Record<number, number[]>;
 };
 
-export default function TodoList(props: TodoListProps) {
-  const { todos } = props;
+export default function TodoList({ todos, earliestStartDates, criticalPath, dependencyIdsMap }: TodoListProps) {
+  // Next.js serializes Date -> string when crossing the server/client boundary.
+  // Cast here since TypeScript doesn't model that transformation.
+  const serialized = todos as unknown as SerializedTodo[];
 
   return (
     <ul>
-      {todos.map((todo) => (
-        <li
+      {serialized.map((todo) => (
+        <TodoItem
           key={todo.id}
-          className="bg-opacity-90 mb-4 flex items-center justify-between rounded-lg bg-white p-4 shadow-lg"
-        >
-          <span className="text-gray-800">{todo.title}</span>
-          <span className="text-gray-800">{todo.dueDate?.toLocaleString()}</span>
-          <button
-            onClick={() => deleteTodo(todo.id)}
-            className="text-red-500 transition duration-300 hover:text-red-700"
-          >
-            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </li>
+          todo={todo}
+          allTodos={serialized}
+          earliestStartDate={earliestStartDates[todo.id] ?? null}
+          isOnCriticalPath={criticalPath.includes(todo.id)}
+          currentDependencyIds={dependencyIdsMap[todo.id] ?? []}
+        />
       ))}
     </ul>
   );

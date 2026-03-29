@@ -1,23 +1,34 @@
 "use client";
 
-import { Todo } from "@/generated/prisma/browser";
 import Image from "next/image";
 import { useState } from "react";
 
+import { cn } from "@/lib/utils";
+
 export type TodoImageProps = {
-  todo: Todo;
+  imageUrl: string | null;
+  alt: string;
 };
 
-export function TodoImage(props: TodoImageProps) {
-  const {
-    todo: { title, imageUrl },
-  } = props;
-
+export default function TodoImage({ imageUrl, alt }: TodoImageProps) {
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(false);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error</div>;
+  if (!imageUrl || error) return null;
 
-  return <Image src={imageUrl} alt={title} />;
+  return (
+    <div className="relative w-full">
+      {loading && <div className="h-32 w-full animate-pulse rounded-t-lg bg-gray-200" />}
+      <Image
+        src={imageUrl}
+        alt={alt}
+        width={0}
+        height={0}
+        sizes="100vw"
+        className={cn("h-auto w-full rounded-t-lg object-cover", loading && "hidden")}
+        onLoad={() => setLoading(false)}
+        onError={() => setError(true)}
+      />
+    </div>
+  );
 }
