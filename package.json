@@ -15,7 +15,8 @@
     "prek:install": "prek install",
     "db:migrate": "prisma migrate dev",
     "db:generate": "prisma generate",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "db:sqlite": "sqlite3 ./prisma/dev.db"
   },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^7.6.0",
