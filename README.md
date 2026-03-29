@@ -46,6 +46,10 @@ Implement a task dependency system that allows tasks to depend on other tasks. T
 4. Calculate the earliest possible start date for each task based on its dependencies
 5. Visualize the dependency graph
 
+## Design Decisions
+
+- Used Next.js Server Components + Server Actions instead of client-side fetching (SWR/TanStack Query). Server components fetch data directly via Prisma with no client-side waterfall or loading spinner. Mutations use `"use server"` functions with `revalidatePath` to trigger re-renders. Only interactive leaf components (forms, delete buttons) are client components. This keeps the JS bundle small and avoids the complexity of client-side cache management, which is appropriate for this app's scope. For a production app with frequent polling, optimistic updates across many components, infinite scroll, or offline support, a client-side data layer like TanStack Query would be worth adding.
+
 ## Submission:
 
 1. Add a new "Solution" section to this README with a description and screenshot or recording of your solution.

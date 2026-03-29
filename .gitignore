@@ -6,3 +6,4 @@ node_modules
 .env
 src/generated
 .claude/settings.local.json
+.worktrees

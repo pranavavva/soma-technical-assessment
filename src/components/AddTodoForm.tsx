@@ -1,6 +1,6 @@
 "use client";
 
-import { addTodo } from "@/app/actions";
+import { addTodo } from "@/app/actions/todo";
 import { useRef } from "react";
 
 export function AddTodoForm() {

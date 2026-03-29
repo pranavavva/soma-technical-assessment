@@ -1,7 +1,7 @@
 "use client";
 
 import { Todo } from "@/generated/prisma/browser";
-import { deleteTodo } from "@/app/actions";
+import { deleteTodo } from "@/app/actions/todo";
 
 export type TodoListProps = {
   todos: Todo[];
