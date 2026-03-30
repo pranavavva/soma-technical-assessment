@@ -1,5 +1,3 @@
-"use client";
-
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { VisuallyHidden } from "radix-ui";
 import Image from "next/image";

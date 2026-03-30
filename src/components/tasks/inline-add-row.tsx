@@ -1,5 +1,3 @@
-"use client";
-
 import { useRef, useState } from "react";
 import { addTodo } from "@/app/actions/todo";
 import { Input } from "@/components/ui/input";
@@ -60,7 +58,7 @@ export function InlineAddRow({ onClose, colSpan }: InlineAddRowProps) {
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="h-8 w-[160px]"
+            className="h-8 w-40"
             disabled={isSubmitting}
           />
           <Button

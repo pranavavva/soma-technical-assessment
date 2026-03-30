@@ -44,7 +44,7 @@ export function calculateEarliestStartDates(todos: TodoNode[], graph: AdjacencyL
  * Critical path = longest chain through the dependency graph (by node count).
  * Returns the IDs of nodes on the critical path, in order.
  */
-export function getCriticalPath(todos: TodoNode[], graph: AdjacencyList): TodoId[] {
+export function getCriticalPath(graph: AdjacencyList): TodoId[] {
   const sorted = topologicalSort(graph);
 
   // For each node, compute the longest path (by node count) ending at that node

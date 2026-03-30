@@ -1,5 +1,3 @@
-"use client";
-
 import { Table } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -37,7 +35,7 @@ export function DataTableToolbar<TData>({ table, onAddTask, isAdding }: DataTabl
         placeholder="Filter tasks..."
         value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
         onChange={(e) => table.getColumn("title")?.setFilterValue(e.target.value)}
-        className="h-8 w-[150px] lg:w-[250px]"
+        className="h-8 w-37.5 lg:w-62.5"
       />
 
       {/* Status faceted filter */}
@@ -55,7 +53,7 @@ export function DataTableToolbar<TData>({ table, onAddTask, isAdding }: DataTabl
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[200px] p-0" align="start">
+        <PopoverContent className="w-50 p-0" align="start">
           <Command>
             <CommandList>
               <CommandEmpty>No results.</CommandEmpty>

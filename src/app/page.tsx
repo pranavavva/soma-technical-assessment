@@ -32,7 +32,7 @@ export default async function Home() {
   }));
 
   const earliestStartDates = calculateEarliestStartDates(todoNodes, graph);
-  const criticalPath = getCriticalPath(todoNodes, graph);
+  const criticalPath = getCriticalPath(graph);
 
   // Build lookup for dependency titles
   const todoById = new Map(todos.map((t) => [t.id, t]));

@@ -130,14 +130,14 @@ export function DependencyFlowGraph({ todos, relationships, criticalPath }: Depe
 
   if (relationships.length === 0) {
     return (
-      <div className="text-muted-foreground flex h-[400px] items-center justify-center">
+      <div className="text-muted-foreground flex h-100 items-center justify-center">
         No dependencies to show. Add dependencies between tasks to see the graph.
       </div>
     );
   }
 
   return (
-    <div className="h-[500px] w-full rounded-lg border">
+    <div className="h-125 w-full rounded-lg border">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -147,7 +147,7 @@ export function DependencyFlowGraph({ todos, relationships, criticalPath }: Depe
         proOptions={{ hideAttribution: true }}
       >
         <Background variant={BackgroundVariant.Dots} gap={24} size={1} />
-        <Controls className="!bg-card !border-border [&>button]:!bg-card [&>button]:!border-border [&>button]:!text-foreground [&>button:hover]:!bg-muted !shadow-md" />
+        <Controls className="bg-card! border-border! [&>button]:bg-card! [&>button]:border-border! [&>button]:text-foreground! [&>button:hover]:bg-muted! shadow-md!" />
       </ReactFlow>
 
       <div className="text-muted-foreground flex gap-4 px-4 py-2 text-xs">

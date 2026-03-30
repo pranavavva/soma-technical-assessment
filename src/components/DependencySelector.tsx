@@ -24,6 +24,44 @@ type DependencySelectorProps = {
   currentDependencyIds: number[];
 };
 
+type CandidateItemProps = {
+  todo: SerializedTodo;
+  isExisting: boolean;
+  isCyclic: boolean;
+  onAdd: (id: number) => void;
+};
+
+function CandidateItem({ todo, isExisting, isCyclic, onAdd }: CandidateItemProps) {
+  const isDisabled = isExisting || isCyclic;
+  const getReason = () => {
+    if (isExisting) return "Already a dependency";
+    if (isCyclic) return "Would create circular dependency";
+    return null;
+  };
+  const reason = getReason();
+
+  return (
+    <CommandItem
+      onSelect={() => !isDisabled && onAdd(todo.id)}
+      disabled={isDisabled}
+      className={isDisabled ? "opacity-50" : ""}
+    >
+      <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex items-center gap-1">
+          {isDisabled && <Ban className="text-muted-foreground h-3 w-3 shrink-0" />}
+          <span className="truncate">{todo.title}</span>
+          {!isDisabled && todo.dueDate && (
+            <span className="text-muted-foreground ml-auto shrink-0 text-xs">
+              {new Date(todo.dueDate).toLocaleDateString()}
+            </span>
+          )}
+        </div>
+        {reason && <span className="text-muted-foreground text-[10px]">{reason}</span>}
+      </div>
+    </CommandItem>
+  );
+}
+
 export default function DependencySelector({ todoId, allTodos, currentDependencyIds }: DependencySelectorProps) {
   const [depIds, setDepIds] = useState<number[]>(currentDependencyIds);
   const [error, setError] = useState<string | null>(null);
@@ -111,38 +149,15 @@ export default function DependencySelector({ todoId, allTodos, currentDependency
               <CommandInput placeholder="Search tasks..." />
               <CommandList>
                 <CommandEmpty>No tasks found.</CommandEmpty>
-                {candidateTodos.map((t) => {
-                  const isExisting = depIds.includes(t.id);
-                  const isCyclic = cycleSet.has(t.id);
-                  const isDisabled = isExisting || isCyclic;
-                  const reason = isExisting
-                    ? "Already a dependency"
-                    : isCyclic
-                      ? "Would create circular dependency"
-                      : null;
-
-                  return (
-                    <CommandItem
-                      key={t.id}
-                      onSelect={() => !isDisabled && handleAdd(t.id)}
-                      disabled={isDisabled}
-                      className={isDisabled ? "opacity-50" : ""}
-                    >
-                      <div className="flex min-w-0 flex-1 flex-col">
-                        <div className="flex items-center gap-1">
-                          {isDisabled && <Ban className="text-muted-foreground h-3 w-3 shrink-0" />}
-                          <span className="truncate">{t.title}</span>
-                          {!isDisabled && t.dueDate && (
-                            <span className="text-muted-foreground ml-auto shrink-0 text-xs">
-                              {new Date(t.dueDate).toLocaleDateString()}
-                            </span>
-                          )}
-                        </div>
-                        {reason && <span className="text-muted-foreground text-[10px]">{reason}</span>}
-                      </div>
-                    </CommandItem>
-                  );
-                })}
+                {candidateTodos.map((t) => (
+                  <CandidateItem
+                    key={t.id}
+                    todo={t}
+                    isExisting={depIds.includes(t.id)}
+                    isCyclic={cycleSet.has(t.id)}
+                    onAdd={handleAdd}
+                  />
+                ))}
               </CommandList>
             </Command>
           </PopoverContent>

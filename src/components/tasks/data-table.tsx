@@ -1,4 +1,5 @@
 "use client";
+"use no memo";
 
 import { Fragment, useState } from "react";
 import {
@@ -33,6 +34,8 @@ export function DataTable({ columns, data }: DataTableProps) {
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
   const [isAdding, setIsAdding] = useState(false);
 
+  // INFO: `"use no memo";` is needed due to an incompatibility between TanStack Table and the React 19 compiler
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,
