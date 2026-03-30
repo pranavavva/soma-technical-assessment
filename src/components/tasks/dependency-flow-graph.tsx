@@ -1,16 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import {
-  ReactFlow,
-  Background,
-  Controls,
-  MiniMap,
-  MarkerType,
-  type Node,
-  type Edge,
-  BackgroundVariant,
-} from "@xyflow/react";
+import { ReactFlow, Background, Controls, MarkerType, type Node, type Edge, BackgroundVariant } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { TaskNode, type TaskNodeData } from "@/components/tasks/task-node";
 
@@ -157,7 +148,6 @@ export function DependencyFlowGraph({ todos, relationships, criticalPath }: Depe
       >
         <Background variant={BackgroundVariant.Dots} gap={24} size={1} />
         <Controls className="!bg-card !border-border [&>button]:!bg-card [&>button]:!border-border [&>button]:!text-foreground [&>button:hover]:!bg-muted !shadow-md" />
-        <MiniMap nodeStrokeWidth={3} className="!bg-card !border-border" />
       </ReactFlow>
 
       <div className="text-muted-foreground flex gap-4 px-4 py-2 text-xs">
