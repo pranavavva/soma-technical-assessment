@@ -44,7 +44,7 @@ export default async function Home() {
       title: t.title,
       status: t.status,
       createdAt: t.createdAt.toISOString(),
-      dueDate: t.dueDate?.toISOString() ?? null,
+      dueDate: t.dueDate ?? null,
       imageUrl: t.imageUrl,
       dependencyIds: depIds,
       dependencyTitles: depIds.map((id) => todoById.get(id)?.title ?? "Unknown"),

@@ -83,7 +83,7 @@ export const columns: ColumnDef<TaskRow>[] = [
       const dueDate = row.getValue("dueDate") as string | null;
       if (!dueDate) return <span className="text-muted-foreground">—</span>;
 
-      const date = new Date(dueDate);
+      const date = new Date(dueDate + "T00:00:00");
       const now = new Date();
       const isOverdue = date < now;
 

@@ -14,7 +14,7 @@ export async function addTodo(formData: FormData) {
     data: {
       title,
       status: "todo",
-      dueDate: dueDate ? new Date(dueDate) : null,
+      dueDate: dueDate || null,
     },
   });
 

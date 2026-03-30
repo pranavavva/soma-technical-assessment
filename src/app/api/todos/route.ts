@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     const todo = await prisma.todo.create({
       data: {
         title,
-        dueDate: dueDate ? new Date(dueDate) : null,
+        dueDate: dueDate || null,
       },
     });
     return NextResponse.json(todo, { status: 201 });

@@ -22,7 +22,8 @@ export function calculateEarliestStartDates(todos: TodoNode[], graph: AdjacencyL
 
     dependencies.forEach((depId) => {
       const depNode = todoMap.get(depId);
-      const depDueDate = depNode?.dueDate ?? null;
+      const depDueDateStr = depNode?.dueDate ?? null;
+      const depDueDate = depDueDateStr ? new Date(depDueDateStr + "T00:00:00") : null;
       const depEarliestStart = earliestStart.get(depId) ?? null;
 
       // The constraint from this dependency is the later of its due date

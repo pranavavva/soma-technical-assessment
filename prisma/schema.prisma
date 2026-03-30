@@ -18,7 +18,7 @@ model Todo {
   title     String
   status    String    @default("todo")
   createdAt DateTime  @default(now())
-  dueDate   DateTime?
+  dueDate   String?
   imageUrl  String?
 
   dependencies TodoRelationship[] @relation("Depdendent")

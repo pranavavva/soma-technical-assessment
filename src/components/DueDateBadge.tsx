@@ -8,7 +8,7 @@ export type DueDateBadgeProps = {
 export default function DueDateBadge({ dueDate }: DueDateBadgeProps) {
   if (!dueDate) return null;
 
-  const date = new Date(dueDate);
+  const date = new Date(dueDate + "T00:00:00");
   const now = new Date();
   const diffDays = Math.ceil((date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
   const isOverdue = diffDays < 0;

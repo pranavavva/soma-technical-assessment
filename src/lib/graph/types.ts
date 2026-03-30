@@ -10,7 +10,11 @@ export function todoId(id: number): TodoId {
 
 export type AdjacencyList = Map<TodoId, TodoId[]>;
 
-export type TodoNode = Pick<Todo, "id" | "title" | "dueDate"> & {
+export type TodoNode = {
+  id: Todo["id"];
+  title: Todo["title"];
+  dueDate: string | null;
+} & {
   dependencyIds: TodoId[]; // IDs this todo depends ON
   dependentIds: TodoId[]; // IDs that depend on THIS todo
 };
