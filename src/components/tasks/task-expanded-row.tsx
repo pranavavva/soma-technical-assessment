@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Clock } from "lucide-react";
@@ -17,6 +18,7 @@ type TaskExpandedRowProps = {
 
 export function TaskExpandedRow({ task, allTasks, colSpan }: TaskExpandedRowProps) {
   const [imageOpen, setImageOpen] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
 
   // Convert TaskRow[] to the SerializedTodo shape that DependencySelector expects
   const allTodosForSelector = allTasks.map((t) => ({
@@ -75,10 +77,18 @@ export function TaskExpandedRow({ task, allTasks, colSpan }: TaskExpandedRowProp
             {/* Right: image thumbnail */}
             {task.imageUrl && (
               <div
-                className="relative h-[120px] cursor-pointer overflow-hidden rounded-lg border transition-opacity hover:opacity-80"
+                className="relative h-30 cursor-pointer overflow-hidden rounded-lg border hover:opacity-80"
                 onClick={() => setImageOpen(true)}
               >
-                <Image src={task.imageUrl} alt={task.title} fill className="object-cover" sizes="200px" />
+                <div className="bg-muted absolute inset-0 animate-pulse object-cover" />
+                <Image
+                  src={task.imageUrl}
+                  alt={task.title}
+                  fill
+                  className={cn("object-cover", imageLoading && "invisible")}
+                  sizes="200px"
+                  onLoad={() => setImageLoading(false)}
+                />
               </div>
             )}
           </div>
